@@ -6,6 +6,7 @@ on:
     tags: [ '*' ]
   pull_request:
     branches: [ feature/cicd-pipeline ]
+    types: [ opened, synchronize, reopened ]
 
 jobs:
   run-test:
