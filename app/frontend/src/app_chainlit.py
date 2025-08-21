@@ -19,7 +19,7 @@ ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "admin123")
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-@cl.password_auth_callback
+# @cl.password_auth_callback
 def auth_callback(username: str, password: str):
     """Simple password authentication - fixed version"""
     try:
@@ -80,10 +80,10 @@ class ChatSettings:
         self.planning = True
         self.ytb_search = True
         self.mcp_server = True
-        self.verbose = False
-        self.parallel = False
+        self.verbose = True
+        self.parallel = True
         self.search_engine = list(SEARCH_ENGINES.values())[0]
-        self.language = "ko-KR"
+        self.language = "en-US"
         self.max_tokens = 4000
         self.temperature = 0.7
 
@@ -142,16 +142,16 @@ async def chat_profile():
     """Set up chat profiles for different languages"""
     return [
         cl.ChatProfile(
-            name="Korean",
-            markdown_description="## Plan Search Chat",
-            icon="/public/images/ai_foundry_icon_small.png",
-            starters=get_starters_for_language("ko-KR")
-        ),
-        cl.ChatProfile(
             name="English", 
             markdown_description="## Plan Search Chat",
             icon="/public/images/ai_foundry_icon_small.png",
             starters=get_starters_for_language("en-US")
+        ),
+        cl.ChatProfile(
+            name="Korean",
+            markdown_description="## Plan Search Chat",
+            icon="/public/images/ai_foundry_icon_small.png",
+            starters=get_starters_for_language("ko-KR")
         ),
     ]
 
@@ -170,7 +170,7 @@ async def start():
             await cl.Message(content="🔧 **Admin Access Granted**\nYou have administrator privileges.").send()
     
     # Get current chat profile
-    profile = cl.user_session.get("chat_profile", "Korean")
+    profile = cl.user_session.get("chat_profile", "English")
     language = "ko-KR" if profile == "Korean" else "en-US"
     
     # Initialize chat settings
@@ -216,13 +216,13 @@ async def start():
         cl.input_widget.Switch(
             id="verbose",
             label=ui_text["verbose_title"],
-            initial=False,
+            initial=True,
             tooltip=ui_text["verbose_desc"]
         ),
         cl.input_widget.Switch(
             id="parallel",
             label=ui_text["parallel_title"],
-            initial=False,
+            initial=True,
             tooltip=ui_text["parallel_desc"]
         ),
         cl.input_widget.Select(
@@ -274,9 +274,9 @@ async def setup_agent(settings_dict: Dict[str, Any]):
     settings.planning = settings_dict.get("planning", True)
     settings.web_search = settings_dict.get("web_search", True)
     settings.ytb_search = settings_dict.get("ytb_search", True)
-    settings.mcp_server = settings_dict.get("mcp_server", False)
-    settings.verbose = settings_dict.get("verbose", False)
-    settings.parallel = settings_dict.get("parallel", False)
+    settings.mcp_server = settings_dict.get("mcp_server", True)
+    settings.verbose = settings_dict.get("verbose", True)
+    settings.parallel = settings_dict.get("parallel", True)
     settings.max_tokens = settings_dict.get("max_tokens", 4000)
     settings.temperature = settings_dict.get("temperature", 0.7)
     
@@ -288,7 +288,7 @@ async def setup_agent(settings_dict: Dict[str, Any]):
     show_starters = settings_dict.get("show_starters", False)
     if show_starters:
         # Re-send starters
-        current_profile = cl.user_session.get("chat_profile", "Korean")
+        current_profile = cl.user_session.get("chat_profile", "English")
         language = "ko-KR" if current_profile == "Korean" else "en-US"
         starters = get_starters_for_language(language)
         
