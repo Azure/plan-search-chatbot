@@ -36,7 +36,7 @@ dependencies = [
     "beautifulsoup4==4.12.2",
     "mcp==1.12.3",
     "gradio==5.33.1",
-    "chainlit==2.6.3",
+    "chainlit==2.9.4",
 ]
 
 [project.optional-dependencies]
