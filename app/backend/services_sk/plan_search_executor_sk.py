@@ -308,6 +308,7 @@ class PlanSearchExecutorSK:
 
             # Web search context
             if include_web_search and search_queries:
+                web_search_contexts = []
 
                 try:
                     if search_engine == SearchEngine.BING_GROUNDING:
