@@ -466,6 +466,7 @@ class PlanSearchExecutorSKParallel:
             search_queries = []
             user_intent = "general_query"  # Initialize user_intent
             intent_data = {}
+            plan_data = None
 
             if query_rewrite:
                 try:

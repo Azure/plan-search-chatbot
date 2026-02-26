@@ -62,7 +62,6 @@ SK_API_URL_PARALLEL = os.getenv("SK_API_URL_PARALLEL", "http://localhost:8000/pl
 
 # Define the search engines
 SEARCH_ENGINES = {
-    "Bing Search": "bing_search_crawling",
     "Grounding Gen": "grounding_bing"
 }
 

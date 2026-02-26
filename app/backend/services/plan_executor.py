@@ -42,7 +42,7 @@ class PlanExecutor:
         self.deployment_name = settings.AZURE_OPENAI_DEPLOYMENT_NAME
         self.query_deployment_name = settings.AZURE_OPENAI_QUERY_DEPLOYMENT_NAME
         self.planner_max_plans = settings.PLANNER_MAX_PLANS
-        self.query_rewriter: QueryRewriter
+        self.query_rewriter: Optional[QueryRewriter] = None
         self.search_crawler: SearchCrawler = BingSearchCrawler()
         logger.debug(
             f"PlanExecutor initialized with Azure OpenAI deployment: {self.deployment_name}"
@@ -141,6 +141,7 @@ class PlanExecutor:
                 logger.debug(f"Generated search queries: {search_queries}")
 
             all_contexts = []
+            all_url_snippet_tuples = []
 
             for i, query in enumerate(search_queries):
                 if stream:
@@ -152,6 +153,7 @@ class PlanExecutor:
                     url_snippet_tuples = [
                         (r["link"], r["snippet"]) for r in search_results
                     ]
+                    all_url_snippet_tuples.extend(url_snippet_tuples)
                     contexts = await search_crawler.extract_contexts_async(
                         url_snippet_tuples
                     )
@@ -179,7 +181,7 @@ class PlanExecutor:
                         date=current_date,
                         contexts=contexts_text,
                         question=enriched_query,
-                        url_citation=json.dumps(url_snippet_tuples, ensure_ascii=False),
+                        url_citation=json.dumps(all_url_snippet_tuples, ensure_ascii=False),
                         locale=locale,
                     ),
                 },

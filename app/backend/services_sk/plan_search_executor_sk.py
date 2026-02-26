@@ -200,6 +200,9 @@ class PlanSearchExecutorSK:
             enriched_query = last_user_message
             search_queries = []
             resource_group_name = None
+            user_intent = "general_query"
+            intent_data = None
+            plan_data = None
 
             if query_rewrite:
                 try:
@@ -311,10 +314,10 @@ class PlanSearchExecutorSK:
                         # Use grounding plugin for BING_GROUNDING
                         logger.info("Using GroundingPlugin for BING_GROUNDING search")
 
-                        text_appended_query = f"{LOCALE_MSG['searching']}...<br>"
+                        text_appended_query = f"{LOCALE_MSG['searching']}... "
                         for i, query in enumerate(search_queries):
                             text_appended_query += (
-                                f"{i}: {LOCALE_MSG['search_keyword']}: {query} <br>"
+                                f"{i}: {LOCALE_MSG['search_keyword']}: {query} "
                             )
 
                         if stream:
@@ -398,7 +401,7 @@ class PlanSearchExecutorSK:
                                 f"=== Web Search ===\n{combined_web_context}"
                             )
 
-                    if verbose and stream:
+                    if verbose and stream and web_search_contexts:
                         yield f"data: {self.send_step_with_code(LOCALE_MSG['search_done'], combined_web_context)}\n\n"
 
                 except Exception as e:
@@ -425,7 +428,7 @@ class PlanSearchExecutorSK:
                                 "youtube", "search_youtube_videos"
                             )
                         mcp_args = KernelArguments()
-                        mcp_args["query"] = enriched_query
+                        mcp_args["query"] = query
 
                         mcp_result = await youtube_search_function.invoke(
                             self.kernel, mcp_args
@@ -447,15 +450,15 @@ class PlanSearchExecutorSK:
                         else:
                             logger.warning("No Youtube Search result returned")
 
-                        if youtube_search_contexts:
-                            combined_youtube_context = "\n\n".join(
-                                youtube_search_contexts
-                            )
-                            all_contexts.append(
-                                f"=== Youtube Search ===\n{combined_youtube_context}"
-                            )
+                    if youtube_search_contexts:
+                        combined_youtube_context = "\n\n".join(
+                            youtube_search_contexts
+                        )
+                        all_contexts.append(
+                            f"=== Youtube Search ===\n{combined_youtube_context}"
+                        )
 
-                    if verbose and stream:
+                    if verbose and stream and youtube_search_contexts:
                         yield f"data: {self.send_step_with_code(LOCALE_MSG['YouTube_done'], combined_youtube_context)}\n\n"
 
                 except Exception as e:
